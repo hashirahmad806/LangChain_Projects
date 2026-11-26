@@ -8,5 +8,6 @@ langchain-openai
 langchain-voyageai
 pymongo
 pypdf
+requests
 streamlit
 langchain-nimble
