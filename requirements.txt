@@ -9,3 +9,4 @@ langchain-voyageai
 pymongo
 pypdf
 streamlit
+langchain-nimble
