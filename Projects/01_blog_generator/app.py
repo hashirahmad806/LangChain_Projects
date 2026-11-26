@@ -100,3 +100,37 @@ final_chain = POLISH_PROMPT | llm | StrOutputParser()
 # UI  DESIGN
 
 st.title(" Ai Blog Post Generator")
+st.caption("Outline -->Draft -->Polish . Three  prompts ,three Chains   Generate a blog post from a topic and tone using AI.")
+
+topic = st.text_input(
+    "Blog Title",   "why we Learn the AI and how we can use it in our daily life")
+tone = st.selectbox("Select the tone for the blog post:", [
+                    "normal", "Informative", "Persuasive", "Entertaining", "Formal", "Casual "])
+
+if st.button("Generate Blog Post", type="primary"):
+    # print("Generating blog post...")
+    with st.spinner("Generating outline..."):
+        outline = outline_chain.invoke({"topic": topic, "tone": tone})
+
+    with st.spinner("Generating draft..."):
+        draft = draft_chain.invoke({"outline": outline, "tone": tone})
+
+
+#  Here  we  Have used the ""  With ""   statement to create a spinner that indicates the progress of each chain.
+# When the user clicks the "Generate Blog Post" button, the system will first generate the outline, then the draft, and finally polish the draft into a final post. Each step will display a spinner to inform the user that the process is ongoing.
+    with st.spinner("Polishing draft..."):
+        final_post = final_chain.invoke({"draft": draft})
+
+    # Display the final polished blog post
+    st.subheader("Final Polished Blog Post:")
+    st.markdown(final_post)
+
+
+#  let we to user  have the option to download the final polished blog post as a text file. We can add a download button that allows the user to save the generated content for future use.
+# or copy the final polished blog post to the clipboard. We can add a button that copies the content to the user's clipboard for easy sharing or pasting into other applications.
+
+    st.download_button("Download Final Post", final_post,
+                       file_name="final_post.txt", mime="text/plain")
+
+    with st.expander("Raw Blog ", expanded=False):
+        st. code(final_post)
