@@ -9,7 +9,7 @@ st.caption("This agent can search anything on the Google for realtime informatio
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Here we  use this   becuse 
+# Here we  use this   because it help
 if "agent" not in st.session_state:
     st.session_state.agent = get_agent()
 
@@ -23,8 +23,8 @@ if query:
     st.session_state.messages.append({"role": "user", "content": query})
     st.chat_message("user").markdown(query)
 
-    res = agent.invoke({"messages": [{"role": "user", "content": query}]},
-                       {"configurable": {"thread_id": "chat_1"}})
+    res = st.session_state.agent.invoke({"messages": [{"role": "user", "content": query}]},
+                                        {"configurable": {"thread_id": "chat_1"}})
     ans = res["messages"][-1].content
 
     st.session_state.messages.append({"role": "ai", "content": ans})

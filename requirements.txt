@@ -11,3 +11,4 @@ pypdf
 requests
 streamlit
 langchain-nimble
+smtplib

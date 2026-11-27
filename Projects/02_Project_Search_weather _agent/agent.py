@@ -23,7 +23,7 @@ def get_agent():
             "then call  the  'weather_search' tool with the city name as input to get the real time weather information.\n"
 
         ),
-        memory=InMemorySaver()
+        checkpointer=InMemorySaver()
     )
 
 
