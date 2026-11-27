@@ -1,6 +1,8 @@
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from tools_modern import ALL_TOOLS
+#  checkpoint AND  InMemorySaver we used  this Because  it helps us
+from langgraph.checkpoint.memory import InMemorySaver
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -21,17 +23,18 @@ def get_agent():
             "then call  the  'weather_search' tool with the city name as input to get the real time weather information.\n"
 
         ),
+        memory=InMemorySaver()
     )
 
 
 # let Run local if  it  works then we can connect it to the  web app  and  then we can deploy it on the cloud.
 
-agent = get_agent()
+# agent = get_agent()
 
-while True:
-    query = input("Enter your query (or type 'exit' to quit): ")
-    if query.lower() == 'exit':
-        break
-    res = agent.invoke({"messages": [{"role": "user", "content": query}]})
-    answer = res["messages"][-1].content
-    print("Agent's response:", answer)
+# while True:
+#     query = input("Enter your query (or type 'exit' to quit): ")
+#     if query.lower() == 'exit':
+#         break
+#     res = agent.invoke({"messages": [{"role": "user", "content": query}]})
+#     answer = res["messages"][-1].content
+#     print("Agent's response:", answer)
