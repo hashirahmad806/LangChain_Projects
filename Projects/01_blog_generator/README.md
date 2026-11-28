@@ -1,59 +1,92 @@
-# AI Blog Post Generator
+﻿# Project 01: AI Blog Post Generator
 
-A small Streamlit application that turns a topic and a chosen writing tone into a polished, downloadable blog post. It uses LangChain prompt pipelines with a Groq-hosted language model.
+A multi-stage content generation pipeline using **LangChain Expression Language (LCEL)** and **Streamlit**, designed to eliminate generic, robotic AI writing through strict stylistic guardrails.
 
-## What the application does
+---
 
-The app in `app.py` accepts a blog topic and tone, then runs three steps:
+## 1. The Core Idea
 
-1. **Outline** — asks the model for an opening line, four section headings, and five key points.
-2. **Draft** — expands the outline into a Markdown blog post and applies the requested tone and human-style writing guidance.
-3. **Polish** — edits the draft without changing its meaning, adds a title, and preserves Markdown formatting.
+When prompted to "write a blog post", LLMs typically generate repetitive, buzzword-heavy content filled with clichés (*"in today's fast-paced world"*, *"delve into"*, *"it's worth noting"*).
 
-The final post appears in the page, can be downloaded as `final_post.txt`, and is also available in a collapsed raw-text panel. Streamlit spinners indicate which generation step is running.
+**`01_blog_generator`** solves this through two architectural decisions:
+1. **Pipeline Decomposition**: Splitting generation into three distinct stages (**Outline $\rightarrow$ Draft $\rightarrow$ Polish**), where each stage has a single, focused responsibility.
+2. **Negative Prompt Styling (`HUMAN_STYLE`)**: A strict ruleset explicitly banning overused AI vocabulary, forcing short-to-long sentence variance, conversational contractions, and concrete examples.
 
-## Requirements
+---
 
-- Python 3.10 or later
-- A Groq API key
-- The Python packages used by the application:
+## 2. How It Works
 
-```powershell
-python -m pip install streamlit langchain langchain-core langchain-groq python-dotenv
+```mermaid
+flowchart TD
+    User([User in Streamlit UI]) -->|Input: Topic & Tone| App[app.py Orchestrator]
+    
+    subgraph Pipeline [LangChain LCEL Multi-Stage Pipeline]
+        App -->|Step 1: OUTLINE_PROMPT| C1[Outline Chain]
+        C1 -->|Hook, 4 Headings, 5 Key Points| C2[Draft Chain]
+        C2 -->|Expands Outline + Applies HUMAN_STYLE| C3[Polish Chain]
+        C3 -->|Adds # Title, Tightens Phrasing, Clean Markdown| Out[Final Polished Post]
+    end
+    
+    Out --> UI[Streamlit UI Display]
+    UI --> Down[Download .txt File]
+    UI --> Exp[Inspect Raw Text in Expander]
 ```
 
-## Configuration
+### The Three Chains
+1. **Outline Chain**:
+   ```python
+   outline_chain = OUTLINE_PROMPT | llm | StrOutputParser()
+   ```
+   Generates an opening hook that provokes curiosity, 4 clear headings, and 5 mandatory talking points.
+2. **Draft Chain**:
+   ```python
+   draft_chain = DRAFT_PROMPT | llm | StrOutputParser()
+   ```
+   Converts the outline into full paragraphs while enforcing the `HUMAN_STYLE` rules.
+3. **Polish Chain**:
+   ```python
+   final_chain = POLISH_PROMPT | llm | StrOutputParser()
+   ```
+   Refines phrasing without altering meaning, formats clean Markdown, and adds a compelling title.
 
-Set `GROQ_API_KEY` before starting the application. You can set it in the shell or create a `.env` file next to `app.py`:
+---
 
+## 3. Main Capabilities & Abilities
+
+- **Anti-AI Stylistic Guardrails**: Banned phrase lists and sentence length variation produce text indistinguishable from human writing.
+- **Interactive UI with Progress Indicators**: Step-by-step visual feedback using `st.spinner("Generating outline...")`, `st.spinner("Drafting...")`, and `st.spinner("Polishing...")`.
+- **Export & Inspection**: Direct `.txt` file downloads and a collapsible code inspection block.
+- **Tone Flexibility**: Allows selecting tones such as *Informative*, *Persuasive*, *Entertaining*, *Formal*, and *Casual*.
+
+---
+
+## 4. File Structure
+
+```
+01_blog_generator/
+├── app.py                       # Streamlit web application & LCEL chain definition
+├── README.md                    # Project documentation
+└── Screenshot 2026-11-26.png    # UI preview screenshot
+```
+
+---
+
+## 5. Setup & How to Run
+
+### Prerequisites
+Make sure dependencies are installed and `GROQ_API_KEY` is present in your `.env` file:
 ```env
-GROQ_API_KEY=your_groq_api_key
+GROQ_API_KEY=gsk_your_groq_api_key_here
 ```
 
-Keep the key private. Do not commit `.env` or publish its contents.
-
-The model is selected by the `MODEL` constant in `app.py` (currently `openai/gpt-oss-20b`). Change that value to use another model supported by your Groq account.
-
-## Run locally
-
-From this directory, run:
-
+### Running the Web Application
 ```powershell
+# From repo root
+streamlit run Projects/01_blog_generator/app.py
+
+# Or from this directory
+cd Projects/01_blog_generator
 streamlit run app.py
 ```
 
-Streamlit opens the app in a browser. Enter a topic, choose a tone, and select **Generate Blog Post**. The first run may take a little while because the app makes three model calls in sequence.
-
-## Implementation overview
-
-- `ChatPromptTemplate` defines separate instructions for outlining, drafting, and polishing.
-- `ChatGroq` provides the shared language model.
-- Each prompt, model call, and `StrOutputParser` are composed into a LangChain pipeline using `|`.
-- The Streamlit UI gathers input, displays progress and the final Markdown, and provides a text download.
-- The model and prompts are initialized when Streamlit runs the script; generation occurs when the button is selected.
-
-The application currently displays only the polished post; the intermediate outline and draft are used internally. Agent and tool-related imports in `app.py` are not currently part of the generation workflow.
-
-## Notes
-
-Generated content can contain inaccurate or outdated claims. Review and fact-check it before publishing. The app requires an active internet connection and valid Groq credentials for generation.
+The browser will open at `http://localhost:8501`. Enter your topic, select your tone, and click **Generate Blog Post**.
