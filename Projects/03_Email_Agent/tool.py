@@ -12,21 +12,24 @@ port = 587  # 587 for STARTTLS, 465 for SSL
 
 
 sender_email = os.getenv("SMTP_SENDER_EMAIL")
+# print(sender_email)
 password = os.getenv("SMTP_PASSWORD")
+# print(password)
+
 
 # Creating Function
 
 
-@tool
 def send_email_by_gmail(to: str, subject: str, body_text: str):
     if not sender_email or not password:
-        raise ValueError("Set SMTP_SENDER_EMAIL and SMTP_PASSWORD before sending email.")
+        raise ValueError(
+            "Set SMTP_SENDER_EMAIL and SMTP_PASSWORD before sending email.")
 
     # 2. Create the MIMEMultipart message container
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = to
-    message["Subject"] = "Plain Text Email Subject"
+    message["Subject"] = subject
     # 3. Attach the plain-text body (explicitly avoiding HTML)
     # body = "Hello,\n\nThis is a plain-text email sent using Python's smtplib and MIMEMultipart."
     message.attach(MIMEText(body_text, "plain", "utf-8"))

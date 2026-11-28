@@ -6,6 +6,8 @@ A collection of LangChain practice and production projects exploring LLM orchest
 
 - **`00_qna_bot`**: An interactive terminal-based Q&A chatbot powered by Groq (`ChatGroq`) and LangChain.
 - **`01_blog_generator`**: An agentic blog content generation tool using LangChain and tools.
+- **`02_Project_Search_weather _agent`**: An agent equipped with search and weather capabilities.
+- **`03_Email_Agent`**: An automated email sending agent built with LangChain, LangGraph checkpointing, and SMTP tools.
 
 ---
 
